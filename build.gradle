@@ -1,0 +1,127 @@
+buildscript {
+    
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+ 	maven { url "https://maven.google.com" }
+        jcenter()
+    }
+    dependencies {
+	classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
+        classpath 'com.android.tools.build:gradle:2.2.0'
+    }
+}
+
+allprojects {
+    apply plugin: "eclipse"
+    apply plugin: "idea"
+
+    version = '1.0'
+    ext {
+        appName = "my-gdx-game"
+        gdxVersion = '1.9.8'
+        roboVMVersion = '2.3.1'
+        box2DLightsVersion = '1.4'
+        ashleyVersion = '1.7.0'
+        aiVersion = '1.8.0'
+	lwjgl3version = '3.1.2-SNAPSHOT'
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+ 	maven { url "https://maven.google.com" }
+ 	maven { url "https://google.bintray.com/googlevr" }
+
+    }
+}
+
+project(":desktop") {
+    apply plugin: "java"
+
+
+    dependencies {
+        compile project(":core")
+        compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    }
+}
+project(":html") {
+    apply plugin: "gwt"
+    apply plugin: "war"
+
+
+    dependencies {
+        compile project(":core")
+        compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
+        compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
+    }
+}
+
+
+project(":android") {
+    apply plugin: "android"
+
+
+    configurations { natives }
+
+    dependencies {
+        compile project(":core")
+
+        compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
+        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
+        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
+        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
+        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
+
+ 	compile 'com.android.support:appcompat-v7:25.1.0'
+    	compile 'com.android.support:design:25.1.0'
+	compile 'com.google.vr:sdk-audio:1.120.0'
+        compile 'com.google.vr:sdk-base:1.120.0'
+        compile 'com.google.vr:sdk-controller:1.120.0'
+
+
+    }
+}
+
+project(":core") {
+    apply plugin: "java"
+
+
+    dependencies {
+        compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+        
+    }
+}
+
+tasks.eclipse.doLast {
+    delete ".project"
+}
+
+// The dependencies for NDK builds live inside the .aar files so they need to
+// be extracted before NDK targets can build.
+task extractAudioSo(type: Copy) {
+    from zipTree("${project.rootDir}/libraries/sdk-audio-1.120.0.aar")
+    into "${project.rootDir}/libraries/"
+    include "jni/**/libgvr_audio.so"
+}
+
+task extractGvrSo(type: Copy) {
+    from zipTree("${project.rootDir}/libraries/sdk-base-1.120.0.aar")
+    into "${project.rootDir}/libraries/"
+    include "jni/**/libgvr.so"
+}
+
+task extractNdk { }
+extractNdk.dependsOn extractAudioSo
+extractNdk.dependsOn extractGvrSo
+
+task deleteNdk(type: Delete) {
+    delete "${project.rootDir}/libraries/jni"
+}
