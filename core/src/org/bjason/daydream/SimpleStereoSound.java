@@ -17,7 +17,7 @@ public class SimpleStereoSound extends PositionListener {
 	@Override
 	public void onCreate(Camera camera) {
 		super.onCreate(camera);
-		sound = Gdx.audio.newSound(Gdx.files.internal("cube_sound.wav"));
+		sound = Gdx.audio.newSound(Gdx.files.internal("data/cube_sound.wav"));
 		id = sound.play(volume);     
 		sound.pause();
 	}

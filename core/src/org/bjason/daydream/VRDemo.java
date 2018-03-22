@@ -3,7 +3,6 @@ package org.bjason.daydream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;

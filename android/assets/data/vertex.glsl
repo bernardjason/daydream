@@ -13,11 +13,10 @@ varying vec2 v_texCoords;
 attribute vec4 a_color;
 uniform mat4 u_projTrans;
  
-varying vec4 vColor;
+varying vec4 vColour;
 varying vec2 vTexCoord;
 void main() {
-	vColor = a_color;
+	vColour = a_color;
 	vTexCoord = a_texCoord0;
 	gl_Position =  u_projTrans * a_position;
-	//gl_Position.x=gl_Position.x/2;
 }
