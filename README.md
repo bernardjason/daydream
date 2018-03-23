@@ -31,6 +31,8 @@ to make just the apk
 Tilt controller to change direction. Touch the touchpad to move while click touchpad when close and looking directly at spinning cube to drop it.
 Press App button (immediately below touchpad) will re-centre controller.
 
+See [youtube short video](https://youtu.be/EO1vzoIGk9E)
+
 ## desktop deploy
 ./gradlew desktop:run
 

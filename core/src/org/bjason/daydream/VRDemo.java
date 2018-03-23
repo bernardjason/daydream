@@ -47,10 +47,11 @@ public class VRDemo extends ApplicationAdapter {
 		this.vr = vr;
 		this.flip = flip;
 	}
+
 	public void addPositionListener(PositionListener listener) {
 		positionListeners.add(listener);
 	}
-	
+
 	static public abstract class PositionListener {
 		protected float x;
 		protected float y;
@@ -58,31 +59,41 @@ public class VRDemo extends ApplicationAdapter {
 		protected Quaternion rotation = new Quaternion();
 		protected Vector3 spatialSoundPosition = new Vector3();
 		protected Camera camera;
-		
+
 		public void update() {
 
 			this.x = camera.position.x;
 			this.y = camera.position.y;
 			this.z = camera.position.z;
-			
+
 			camera.combined.getRotation(rotation);
 		}
+
 		public void soundPosition(Vector3 position) {
 			spatialSoundPosition.set(position);
 		}
-		abstract public void listen() ;
-		abstract public void soundListen() ;
-		abstract public void startPlaySound() ;
-		abstract public void stopPlaySound() ;
+
+		abstract public void listen();
+
+		abstract public void soundListen();
+
+		abstract public void startPlaySound();
+
+		abstract public void stopPlaySound();
+
 		public void playSound(boolean playIt) {
-			if ( playIt )  startPlaySound();
-			else stopPlaySound();
+			if (playIt)
+				startPlaySound();
+			else
+				stopPlaySound();
 		}
-		public void onCreate(Camera camera)  {
+
+		public void onCreate(Camera camera) {
 			this.camera = camera;
 		}
-		
+
 	}
+
 	private List<PositionListener> positionListeners = new ArrayList<PositionListener>();
 
 	Array<ModelInstance> modelInstances = new Array<ModelInstance>();
@@ -111,9 +122,9 @@ public class VRDemo extends ApplicationAdapter {
 
 	@Override
 	public void create() {
-		//if ( Gdx.app.getType() == ApplicationType.WebGL) {
-            		//Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
-        	//}
+		// if ( Gdx.app.getType() == ApplicationType.WebGL) {
+		// Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+		// }
 
 		frameBuffer = new FrameBuffer(Format.RGB888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 		Gdx.graphics.setVSync(true);
@@ -129,16 +140,16 @@ public class VRDemo extends ApplicationAdapter {
 		camera.near = 1f;
 		camera.far = 300f;
 		camera.update();
-		daydreamController = new DaydreamController(camera,vr);
+		daydreamController = new DaydreamController(camera, vr);
 		camera.position.y = MIN_HEIGHT;
 		Gdx.input.setInputProcessor(daydreamController);
 
 		camera.update();
 
-		for(PositionListener l:positionListeners ) {
+		for (PositionListener l : positionListeners) {
 			l.onCreate(camera);
 		}
-		
+
 		batch = new ModelBatch();
 
 		ModelBuilder modelBuilder = new ModelBuilder();
@@ -150,25 +161,28 @@ public class VRDemo extends ApplicationAdapter {
 
 	private void pickRandomCube() {
 		boolean done = false;
-		currentCube=null;
-		for(PositionListener l:positionListeners ) {
+		currentCube = null;
+		for (PositionListener l : positionListeners) {
 			l.playSound(false);
 		}
-		int j = (int) (Math.random() * 1000) % cubes.size;
-		j = 9;
-		for (int i = 0; i < cubes.size; i++) {
-			if (j >= cubes.size) j = 0;
+		if (cubes.size > 0) {
+			int j = (int) (Math.random() * 1000) % cubes.size;
+			j = 9;
+			for (int i = 0; i < cubes.size; i++) {
+				if (j >= cubes.size)
+					j = 0;
 
-			ModelInstance mi = cubes.get(j++);
+				ModelInstance mi = cubes.get(j++);
 
-			mi.transform.getTranslation(tmp3);
-			if (!done && mi.userData == null && tmp3.y > 0) {
-				mi.userData = "pickme";
-				currentCube=mi;
-				done = true;
-				for(PositionListener l:positionListeners ) {
-					l.soundPosition(tmp3);
-					l.playSound(true);
+				mi.transform.getTranslation(tmp3);
+				if (!done && mi.userData == null && tmp3.y > 0) {
+					mi.userData = "pickme";
+					currentCube = mi;
+					done = true;
+					for (PositionListener l : positionListeners) {
+						l.soundPosition(tmp3);
+						l.playSound(true);
+					}
 				}
 			}
 		}
@@ -255,7 +269,6 @@ public class VRDemo extends ApplicationAdapter {
 	@Override
 	public void render() {
 		logger.log();
-		
 
 		daydreamController.update();
 
@@ -267,31 +280,31 @@ public class VRDemo extends ApplicationAdapter {
 		}
 		camera.update();
 
-		for(PositionListener l:positionListeners ) {
+		for (PositionListener l : positionListeners) {
 			l.update();
 			l.listen();
 			l.soundListen();
 		}
 
-			if (currentCube != null) {
-				currentCube.transform.getTranslation(tmp3);
+		if (currentCube != null) {
+			currentCube.transform.getTranslation(tmp3);
 
-				currentCube.transform.rotate(1, 0, 0, SPIN);
-				currentCube.transform.rotate(0, 1, 0, SPIN);
-				if (tmp3.dst(camera.position) < 10 && daydreamController.isTouchPadClicked()) {
-					Ray ray = new Ray(camera.position, camera.direction);
-					boolean lookat = Intersector.intersectRaySphere(ray, tmp3, 2, intersection);
-					if (lookat) {
-						tmp3.y = 0;
-						currentCube.transform.setTranslation(tmp3);
-						currentCube.userData = null;
-						cubes.removeValue(currentCube, true);
-						pickRandomCube();
-					}
+			currentCube.transform.rotate(1, 0, 0, SPIN);
+			currentCube.transform.rotate(0, 1, 0, SPIN);
+			if (tmp3.dst(camera.position) < 10 && daydreamController.isTouchPadClicked()) {
+				Ray ray = new Ray(camera.position, camera.direction);
+				boolean lookat = Intersector.intersectRaySphere(ray, tmp3, 2, intersection);
+				if (lookat) {
+					tmp3.y = 0;
+					currentCube.transform.setTranslation(tmp3);
+					currentCube.userData = null;
+					cubes.removeValue(currentCube, true);
+					pickRandomCube();
 				}
-			} else {
-				pickRandomCube();
 			}
+		} else {
+			pickRandomCube();
+		}
 
 		frameBuffer.begin();
 		Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
@@ -340,6 +353,5 @@ public class VRDemo extends ApplicationAdapter {
 			m.dispose();
 		floorModel.dispose();
 	}
-
 
 }

@@ -1,7 +1,5 @@
 package org.bjason.daydream;
 
-import org.bjason.daydream.VRDemo.PositionListener;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
@@ -121,7 +119,7 @@ public class AndroidLauncher extends AndroidApplication {
 	private class EventListener extends Controller.EventListener implements ControllerManager.EventListener, Runnable {
 
 		private String apiStatus;
-		float joystickSensitive = 25f;
+		float joystickSensitive = 15f;
 
 		private int controllerState = ConnectionStates.DISCONNECTED;
 
