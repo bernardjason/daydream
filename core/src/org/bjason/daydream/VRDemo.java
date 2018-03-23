@@ -157,10 +157,9 @@ public class VRDemo extends ApplicationAdapter {
 		int j = (int) (Math.random() * 1000) % cubes.size;
 		j = 9;
 		for (int i = 0; i < cubes.size; i++) {
-			ModelInstance mi = cubes.get(j++);
+			if (j >= cubes.size) j = 0;
 
-			if (j >= cubes.size)
-				j = 0;
+			ModelInstance mi = cubes.get(j++);
 
 			mi.transform.getTranslation(tmp3);
 			if (!done && mi.userData == null && tmp3.y > 0) {
